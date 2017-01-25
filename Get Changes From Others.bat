@@ -1,5 +1,5 @@
 @ECHO off
 
-git pull
+..\..\Git\bin\git pull
 
 IF %ERRORLEVEL% NEQ 0 PAUSE
