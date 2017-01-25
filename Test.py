@@ -138,15 +138,15 @@ while 1:
             
     #platorm ranges so he cand stand above the ledges
     #Player 1
-    if p1rect.x > platrect1.x - 20 and p1rect.x + p1rect.w < platrect1.x + (platrect1.w + 40) and p1rect.y < 150 and p1rect.y > 150-p1rect.h:
-        p1rect.y = 149 - p1rect.h
+    if p1rect.x > platrect1.x - 40 and p1rect.x + p1rect.w < platrect1.x + (platrect1.w + 40) and p1rect.y < 150 and p1rect.y > 150-p1rect.h:
+        p1rect.y = 150 - p1rect.h
         p1Yspeed = 0
         PressSinceGround = 0
-    if p1rect.x > platrect2.x - 20 and p1rect.x + p1rect.w < platrect2.x + (platrect2.w + 40)  and p1rect.y < 250 and p1rect.y > 250-p1rect.h:
-        p1rect.y = 249 - p1rect.h
+    if p1rect.x > platrect2.x - 40 and p1rect.x + p1rect.w < platrect2.x + (platrect2.w + 40)  and p1rect.y < 250 and p1rect.y > 250-p1rect.h:
+        p1rect.y = 250 - p1rect.h
         p1Yspeed = 0
         PressSinceGround = 0
-    if p1rect.x > platrect3.x - 20 and p1rect.x + p1rect.w < platrect3.x + (platrect3.w + 40)  and p1rect.y < 420 and p1rect.y > 420-p1rect.h:
+    if p1rect.x > platrect3.x - 40 and p1rect.x + p1rect.w < platrect3.x + (platrect3.w + 40)  and p1rect.y < 420 and p1rect.y > 420-p1rect.h:
         p1rect.y = 420 - p1rect.h
         p1Yspeed = 0
         PressSinceGround = 0
