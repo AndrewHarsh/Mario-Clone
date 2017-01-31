@@ -6,6 +6,11 @@ speed = [2, 2]
 black = 0, 0, 0
 
 screen = pygame.display.set_mode(size)
+ball = pygame.image.load("ball.bmp")
+ballrect = ball.get_rect()
+
+ballrect.x = 100
+ballrect.y = 600
 
 player1 = pygame.image.load("mario_sprite.png")
 player2 = pygame.image.load("luigi_sprite.png")
@@ -52,7 +57,6 @@ platrect2.y = 220
 
 platrect3.x = 380
 platrect3.y = 420
-
 p1SinceGround = 0
 p2SinceGround = 0
 
@@ -185,9 +189,6 @@ while 1:
         p2SinceGround = 0
     elif p2rect.y < 0:
         p2Yspeed += 2
-
-    
-    
 
     screen.fill(black)
     screen.blit(player1, p1rect)
