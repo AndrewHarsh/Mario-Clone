@@ -9,7 +9,6 @@ screen = pygame.display.set_mode(size)
 
 player1 = pygame.image.load("mario_sprite.png")
 player2 = pygame.image.load("luigi_sprite.png")
-
 ground = pygame.image.load("ground.png")
 
 platform1 = pygame.image.load("platform1.png")
@@ -24,9 +23,11 @@ platrect1 = platform1.get_rect()
 platrect2 = platform2.get_rect()
 platrect3 = platform3.get_rect()
 
+#Player initial speed
 p1Yspeed = 0
 p2Yspeed = 0
 
+#Initial Movement presets
 pressedLeft = False
 pressedRight = False
 pressedLBoost = False
@@ -44,15 +45,16 @@ p2rect.x = 100
 p2rect.y = 600
 
 platrect1.x = 0
-platrect1.y = 150
+platrect1.y = 120
 
 platrect2.x = 820
-platrect2.y = 250
+platrect2.y = 220
 
 platrect3.x = 380
 platrect3.y = 420
 
-PressSinceGround = 0
+p1SinceGround = 0
+p2SinceGround = 0
 
 while 1:
     for event in pygame.event.get():
@@ -60,11 +62,11 @@ while 1:
             pygame.display.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            #Player1
+            #_____Player1________________________________________________
             if event.key == pygame.K_w:
-                if PressSinceGround < 2:
+                if p1SinceGround < 2:
                     p1Yspeed = -35
-                PressSinceGround += 1
+                p1SinceGround += 1
             elif event.key == pygame.K_a:
                 pressedLeft = True
                 player1 = pygame.image.load("mario_sprite_left.png")
@@ -72,13 +74,12 @@ while 1:
                 pressedRight = True
                 player1 = pygame.image.load("mario_sprite.png")
             elif event.key == pygame.K_LSHIFT:
-                pressedLBoost = True
-                
-            #Player2
+                pressedLBoost = True     
+            #_____Player2________________________________________________
             if event.key == pygame.K_UP:
-                if PressSinceGround < 2:
+                if p2SinceGround < 2:
                     p2Yspeed = -35
-                PressSinceGround += 1
+                p2SinceGround += 1
             elif event.key == pygame.K_LEFT:
                 pressedLeftArrow = True
                 player2 = pygame.image.load("luigi_sprite_left.png")
@@ -89,15 +90,14 @@ while 1:
                 pressedRBoost = True
                 
         elif event.type == pygame.KEYUP:
-            #Player1
+            #_____Player1________________________________________________
             if event.key == pygame.K_a:
                 pressedLeft = False
             elif event.key == pygame.K_d:
                 pressedRight = False
             elif event.key == pygame.K_LSHIFT:
                 pressedLBoost = False
-                
-            #Player2
+            #_____Player2________________________________________________
             if event.key == pygame.K_LEFT:
                 pressedLeftArrow = False
             elif event.key == pygame.K_RIGHT:
@@ -117,7 +117,7 @@ while 1:
         p2rect.x = 0 
 
     #movement
-    #player1
+    #_____Player1________________________________________________
     if pressedLeft == True:
         p1rect.x -= 20
         if pressedLBoost == True:
@@ -126,7 +126,7 @@ while 1:
         p1rect.x += 20
         if pressedLBoost == True:
             p1rect.x += 30
-    #player2    
+    #_____Player2________________________________________________    
     if pressedLeftArrow == True:
         p2rect.x -= 20
         if pressedRBoost == True:
@@ -138,34 +138,34 @@ while 1:
             
     #platorm ranges so he cand stand above the ledges
     #Player 1
-    if p1rect.x > platrect1.x - 40 and p1rect.x + p1rect.w < platrect1.x + (platrect1.w + 40) and p1rect.y < 150 and p1rect.y > 150-p1rect.h:
-        p1rect.y = 150 - p1rect.h
+    if p1rect.x > platrect1.x - 40 and p1rect.x + p1rect.w < platrect1.x + (platrect1.w + 40) and p1rect.y < 120 and p1rect.y > 120-p1rect.h:
+        p1rect.y = 120 - p1rect.h
         p1Yspeed = 0
-        PressSinceGround = 0
-    if p1rect.x > platrect2.x - 40 and p1rect.x + p1rect.w < platrect2.x + (platrect2.w + 40)  and p1rect.y < 250 and p1rect.y > 250-p1rect.h:
-        p1rect.y = 250 - p1rect.h
+        p1SinceGround = 0
+    if p1rect.x > platrect2.x - 40 and p1rect.x + p1rect.w < platrect2.x + (platrect2.w + 40)  and p1rect.y < 220 and p1rect.y > 220-p1rect.h:
+        p1rect.y = 220 - p1rect.h
         p1Yspeed = 0
-        PressSinceGround = 0
+        p1SinceGround = 0
     if p1rect.x > platrect3.x - 40 and p1rect.x + p1rect.w < platrect3.x + (platrect3.w + 40)  and p1rect.y < 420 and p1rect.y > 420-p1rect.h:
         p1rect.y = 420 - p1rect.h
         p1Yspeed = 0
-        PressSinceGround = 0
+        p1SinceGround = 0
     else:
         p1Yspeed +=2
         
     #Player 2
-    if p2rect.x > platrect1.x - 20 and p2rect.x + p2rect.w < platrect1.x + (platrect1.w + 40) and p2rect.y < 150 and p2rect.y > 150-p2rect.h:
-        p2rect.y = 150 - p2rect.h
+    if p2rect.x > platrect1.x - 20 and p2rect.x + p2rect.w < platrect1.x + (platrect1.w + 40) and p2rect.y < 120 and p2rect.y > 120-p2rect.h:
+        p2rect.y = 120 - p2rect.h
         p2Yspeed = 0
-        PressSinceGround = 0
-    if p2rect.x > platrect2.x - 20 and p2rect.x + p2rect.w < platrect2.x + (platrect2.w + 40)  and p2rect.y < 250 and p2rect.y > 250-p2rect.h:
-        p2rect.y = 250 - p2rect.h
+        p2inceGround = 0
+    if p2rect.x > platrect2.x - 20 and p2rect.x + p2rect.w < platrect2.x + (platrect2.w + 40)  and p2rect.y < 220 and p2rect.y > 220-p2rect.h:
+        p2rect.y = 220 - p2rect.h
         p2Yspeed = 0
-        PressSinceGround = 0
+        p2SinceGround = 0
     if p2rect.x > platrect3.x - 20 and p2rect.x + p2rect.w < platrect3.x + (platrect3.w + 40)  and p2rect.y < 420 and p2rect.y > 420-p2rect.h:
         p2rect.y = 420 - p2rect.h
         p2Yspeed = 0
-        PressSinceGround = 0
+        p2SinceGround = 0
     else:
         p2Yspeed +=2
         
@@ -175,14 +175,14 @@ while 1:
     if p1rect.y > 600:
         p1rect.y = 600
         p1Yspeed = 0
-        PressSinceGround = 0
+        p1SinceGround = 0
     elif p1rect.y < 0:
         p1Yspeed += 2
         
     if p2rect.y > 600:
         p2rect.y = 600
         p2Yspeed = 0
-        PressSinceGround = 0
+        p2SinceGround = 0
     elif p2rect.y < 0:
         p2Yspeed += 2
 
