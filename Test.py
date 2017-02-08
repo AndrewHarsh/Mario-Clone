@@ -2,25 +2,15 @@ import sys, pygame, time
 pygame.init()
 
 size = width, height = 1080, 720
-speed = [2, 2]
 black = 0, 0, 0
-
-class Image():
-    def __init__(self, FileName, Screen):
-        self.Screen = Screen
-        self.FileName = FileName
-        self.Image = pygame.image.load(FileName)
-        self.X = 0
-        self.Y = 0
-        self.W = self.Image.get_rect().w
-        self.H = self.Image.get_rect().h
-
-    def Display(self):
-        self.Screen.blit(self.Image, [self.X, self.Y, self.W, self.H])
 
 
 class Player():
-    def __init__(self, imageFilename):
+    fallSpeed = 2
+    moveSpeed = 20
+    boostMoveSpeed = 30
+    
+    def __init__(self, x, y, imageFilename):
         self.image = pygame.image.load(imageFilename)
         self.rect = self.image.get_rect()
         self.Yspeed = 0
@@ -29,8 +19,8 @@ class Player():
         self.pressedRight = False
         self.pressedBoost = False
         
-        self.rect.x = 100
-        self.rect.y = 600
+        self.rect.x = x
+        self.rect.y = y
 
         self.PressSinceGround = 0
 
@@ -42,13 +32,13 @@ class Player():
 
     def Movement(self):
         if self.pressedLeft == True:
-            self.rect.x -= 20
+            self.rect.x -= Player.moveSpeed
             if self.pressedBoost == True:
-                self.rect.x -= 30
+                self.rect.x -= Player.boostMoveSpeed
         elif self.pressedRight == True:
-            self.rect.x += 20
+            self.rect.x += Player.moveSpeed
             if self.pressedBoost == True:
-                self.rect.x += 30
+                self.rect.x += Player.boostMoveSpeed
 
     def CheckPlatforms(self, platrect1, platrect2, platrect3):
         if self.rect.x > platrect1.x - 20 and self.rect.x + self.rect.w < platrect1.x + (platrect1.w + 40) and self.rect.y < 150 and self.rect.y > 150-self.rect.h:
@@ -64,7 +54,7 @@ class Player():
             self.Yspeed = 0
             self.PressSinceGround = 0
         else:
-            self.Yspeed +=2
+            self.Yspeed += Player.fallSpeed
 
     def SetPosition(self):
         self.rect = self.rect.move(0, self.Yspeed)
@@ -75,7 +65,7 @@ class Player():
             self.Yspeed = 0
             self.PressSinceGround = 0
         elif self.rect.y < 0:
-            self.Yspeed += 2
+            self.Yspeed += Player.fallSpeed
 
     def Display(self, screen):
         screen.blit(self.image, self.rect)
@@ -83,14 +73,17 @@ class Player():
 
 
 class Mario(Player):
-    def __init__(self):
-         super(Mario, self).__init__("mario_sprite.png")
+    allowedDoubleJumps = 2
+    jumpSpeed = 35
+    
+    def __init__(self, x, y):
+         super(Mario, self).__init__(x, y, "mario_sprite.png")
     
     def HandleEvent(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                if self.PressSinceGround < 2:
-                    self.Yspeed = -35
+                if self.PressSinceGround < Mario.allowedDoubleJumps:
+                    self.Yspeed = -Mario.jumpSpeed
                 self.PressSinceGround += 1
             elif event.key == pygame.K_a:
                 self.pressedLeft = True
@@ -110,14 +103,17 @@ class Mario(Player):
                 self.pressedBoost = False
 
 class Luigi(Player):
-    def __init__(self):
-         super(Luigi, self).__init__("luigi_sprite.png")
-         
+    allowedDoubleJumps = 2
+    jumpSpeed = 35
+    
+    def __init__(self, x, y):
+         super(Luigi, self).__init__(x, y, "luigi_sprite.png")
+        
     def HandleEvent(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                if self.PressSinceGround < 2:
-                    self.Yspeed = -35
+                if self.PressSinceGround < Luigi.allowedDoubleJumps:
+                    self.Yspeed = -Luigi.jumpSpeed
                 self.PressSinceGround += 1
             elif event.key == pygame.K_LEFT:
                 self.pressedLeft = True
@@ -136,33 +132,26 @@ class Luigi(Player):
             elif event.key == pygame.K_RSHIFT:
                 self.pressedBoost = False
 
+class Platform():
+    def __init__(self, filename, x, y):
+        self.image = pygame.image.load(filename)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def Display(self, screen):
+        screen.blit(self.image, self.rect)
+        
 
 
 screen = pygame.display.set_mode(size)
-p1 = Mario()
-p2 = Luigi()
-ground = pygame.image.load("ground.png")
+p1 = Mario(100, 600)
+p2 = Luigi(100, 600)
 
-platform1 = pygame.image.load("platform1.png")
-platform2 = pygame.image.load("platform2.png")
-platform3 = pygame.image.load("platform3.png")
-
-groundrect = ground.get_rect()
-platrect1 = platform1.get_rect()
-platrect2 = platform2.get_rect()
-platrect3 = platform3.get_rect()
-
-groundrect.x = 0
-groundrect.y = 600+p1.rect.h
-
-platrect1.x = 0
-platrect1.y = 120
-
-platrect2.x = 820
-platrect2.y = 220
-
-platrect3.x = 380
-platrect3.y = 420
+ground = Platform("ground.png", 0, 600+p1.rect.h) 
+platform1 = Platform("platform1.png", 0, 120) 
+platform2 = Platform("platform2.png", 820, 220) 
+platform3 = Platform("platform3.png", 380, 420) 
 
 while True:
     for event in pygame.event.get():
@@ -178,8 +167,8 @@ while True:
     p1.Movement()
     p2.Movement()
     
-    p1.CheckPlatforms(platrect1, platrect2, platrect3)
-    p2.CheckPlatforms(platrect1, platrect2, platrect3)
+    p1.CheckPlatforms(platform1.rect, platform2.rect, platform3.rect)
+    p2.CheckPlatforms(platform1.rect, platform2.rect, platform3.rect)
     
     p1.SetPosition()
     p2.SetPosition()
@@ -190,10 +179,10 @@ while True:
     screen.fill(black)
     p1.Display(screen)
     p2.Display(screen)
-    screen.blit(ground, groundrect)
-    screen.blit(platform1, platrect1)
-    screen.blit(platform2, platrect2)
-    screen.blit(platform3, platrect3)
+    ground.Display(screen)
+    platform1.Display(screen)
+    platform2.Display(screen)
+    platform3.Display(screen)
     pygame.display.flip()
 
     time.sleep(0.05)
