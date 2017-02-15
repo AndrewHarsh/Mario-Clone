@@ -4,6 +4,109 @@ pygame.init()
 size = width, height = 1080, 720
 black = 0, 0, 0
 
+class Object:
+    # Override
+    def Update(self):
+        print('Please override me')
+
+
+class PlayerDeen(Object):
+    imageFilename = 'mario_sprite.png'
+    Speed = 20
+    BoostPercent = .50
+    JumpSpeed = 20
+    JumpLimit = 2
+
+    def __init__(self, x, y, screen):
+        self.screen = screen
+        self.image = pygame.image.load(PlayerDeen.imageFilename)
+        self.rect = self.image.get_rect()
+        self.position = pygame.Rect(x, y, 0, 0)
+        self.velocity = pygame.Rect(0, 0, 0, 0)
+        self.acceleration = pygame.Rect(0, 0, 0, 0)
+        self.numOfJumpsSinceGround = 0
+        self.direction = 'None'
+        
+    def Update(self, events):
+        self.HandleEvents(events)
+        self.Move()
+        self.Jump()
+        self.Boost()
+        self.AddInertia()
+        self.JumpScreens()
+        self.Display()
+
+    def HandleEvents(self, events):
+        self.jumping = False
+        self.boosting = False
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    self.jumping = True
+                elif event.key == pygame.K_j:
+                    self.direction = 'Left'
+                elif event.key == pygame.K_l:
+                    self.direction = 'Right'
+                elif event.key == pygame.K_k:
+                    self.boosting = True
+                    
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_j:
+                    self.direction = 'None'
+                elif event.key == pygame.K_l:
+                    self.direction = 'None'
+                elif event.key == pygame.K_k:
+                    self.boosting = False
+
+    def Jump(self):
+        if (not self.jumping):
+            return
+        
+        if (self.numOfJumpsSinceGround < PlayerDeen.JumpLimit):
+            self.velocity.y = -PlayerDeen.JumpSpeed
+            self.numOfJumpsSinceGround += 1
+
+    def Move(self):
+        if (self.direction == 'Left'):
+            self.velocity.x = -PlayerDeen.Speed
+        elif (self.direction == 'Right'):
+            self.velocity.x = PlayerDeen.Speed
+        else:
+            self.velocity.x = 0
+
+    def Boost(self):
+        if (not self.boosting):
+            return
+        
+        self.velocity.x *= (1 + PlayerDeen.BoostPercent)
+        self.velocity.y *= (1 + PlayerDeen.BoostPercent)
+
+    def AddInertia(self):
+        self.velocity.x += self.acceleration.x
+        self.velocity.y += self.acceleration.y
+        self.position.x += self.velocity.x
+        self.position.y += self.velocity.y
+
+        # Gravity
+        self.velocity.y += 1
+        if (self.position.y > 600):
+            self.position.y = 600
+
+    def JumpScreens(self):
+        if (self.position.x + self.rect.w < 0):
+            self.position.x = 1080
+        elif (self.position.x > 1080):
+            self.position.x = 0
+        
+    def Display(self):
+        self.screen.blit(self.image, self.position)
+        
+
+
+
+
+                
+
 
 class Player():
     fallSpeed = 2
@@ -91,7 +194,7 @@ class Mario(Player):
             elif event.key == pygame.K_d:
                 self.pressedRight = True
                 self.image = pygame.image.load("mario_sprite.png")
-            elif event.key == pygame.K_LSHIFT:
+            elif event.key == pygame.K_q:
                 self.pressedBoost = True
 
         elif event.type == pygame.KEYUP:
@@ -99,7 +202,7 @@ class Mario(Player):
                 self.pressedLeft = False
             elif event.key == pygame.K_d:
                 self.pressedRight = False
-            elif event.key == pygame.K_LSHIFT:
+            elif event.key == pygame.K_q:
                 self.pressedBoost = False
 
 class Luigi(Player):
@@ -147,6 +250,7 @@ class Platform():
 screen = pygame.display.set_mode(size)
 p1 = Mario(100, 600)
 p2 = Luigi(100, 600)
+Deen = PlayerDeen(100, 600, screen)
 
 ground = Platform("ground.png", 0, 600+p1.rect.h) 
 platform1 = Platform("platform1.png", 0, 120) 
@@ -154,7 +258,8 @@ platform2 = Platform("platform2.png", 820, 220)
 platform3 = Platform("platform3.png", 380, 420) 
 
 while True:
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT:
             pygame.display.quit()
             sys.exit()
@@ -177,6 +282,7 @@ while True:
     p2.StopOnGround()
     
     screen.fill(black)
+    Deen.Update(events)
     p1.Display(screen)
     p2.Display(screen)
     ground.Display(screen)
